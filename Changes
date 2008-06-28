@@ -1,0 +1,19 @@
+Revision history for Apache-Bootstrap
+
+0.04  Fri Jun 27 20:58:58 PST 2008
+    - more tests, coverage for success conditions
+    - now we actually fail at compile time if base mod_perl is not present
+
+0.03  Sun Jun 22 01:28:13 PST 2008
+    - fail at compile time if mod_perl dependencies are not present
+    - put the constructor back now that it has a use case
+    - add a few helper methods, and WriteMakefile which uses the appropriate
+        build subsystem
+
+0.02  Fri Jun 20 15:28:27 PST 2008
+    - change interface call methods as class methods
+    - default to finding mp2 before finding mp1
+
+0.01  Thu May 10 00:13:05 PST 2008
+    - First version, released on an unsuspecting world.
+

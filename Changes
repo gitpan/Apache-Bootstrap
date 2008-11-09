@@ -1,6 +1,10 @@
 Revision history for Apache-Bootstrap
 
-0.04  Fri Jun 27 20:58:58 PST 2008
+0.04_02  Sat Nov 08 17:07:56 PST 2008
+    - skip more tests if no versions of mod_perl are present
+    - clean up a bit more of the convoluted logic
+
+0.04_01  Fri Jun 27 20:58:58 PST 2008
     - more tests, coverage for success conditions
     - now we actually fail at compile time if base mod_perl is not present
 

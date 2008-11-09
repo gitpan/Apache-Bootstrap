@@ -1,52 +1,119 @@
-Apache-Bootstrap
+NAME
+    Apache::Bootstrap - Bootstraps dual life mod_perl1 and mod_perl2 Apache
+    modules
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+SYNOPSIS
+    In your Makefile.PL
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+     use Apache::Bootstrap 0.04;
 
+     my $bootstrap;
 
-INSTALLATION
+     BEGIN {
+        # make sure we have at least one minimum version required
+        $bootstrap = Apache::Bootstrap->new({ mp2 => '1.99022', mp1 => 0, });
+     }
 
-To install this module, run the following commands:
+     # write the Makefile using a mod_perl version dependent build subsystem
+     $bootstrap->WriteMakefile( %maker_options );
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+     # check for Apache::Test, return the installed version if exists
+     my $has_apache_test = $bootstrap->check_for_apache_test();
 
-SUPPORT AND DOCUMENTATION
+     # see if mod_perl2 is installed
+     my $mp_generation = $bootstrap->satisfy_mp_generation( 2 );
 
-After installing, you can find documentation for this module with the
-perldoc command.
+     unless ($mp_generation) {
 
-    perldoc Apache::Bootstrap
+         # no mod_perl2?  look for mod_perl 1
+         $mp_generation = $bootstrap->satisfy_mp_generation( 1 );
+     }
 
-You can also look for information at:
+     # any mod_perl version will do
+     $mp_generation = Apache::Bootstrap->satisfy_mp_generation();
+     unless ( $mp_generation ) {
+          warn( 'No mod_perl installation was found' )
+     } else {
+          warn( "mod_perl generation $mp_generation was found" );
+     }
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache-Bootstrap
+METHODS
+  new()
+     # try to find these versions of mod_perl, die if none are found
+     $bootstrap = Apache::Bootstrap->new({
+         mod_perl2 => 1.99022, # after mp2 renaming
+         mod_perl1 => 0,       # any verison of mp1
+     });
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Apache-Bootstrap
+  mp_prereqs()
+     # returns the prerequisites for mod_perl versions in a hash reference
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Apache-Bootstrap
+  check_for_apache_test()
+     $apache_test_version = Apache::Bootstrap->check_for_apache_test;
 
-    Search CPAN
-        http://search.cpan.org/dist/Apache-Bootstrap
+    Returns the version of Apache::Test installed. Returns undefined if
+    Apache::Test is not installed.
 
+  satisfy_mp_generation()
+     # see if mod_perl2 is installed
+     my $mp_generation = Apache::Bootstrap->satisfy_mp_generation( 2 );
 
-COPYRIGHT AND LICENCE
+     unless ($mp_generation) {
 
-Copyright (C) 2008 Fred Moyer
+         # no mod_perl2?  look for mod_perl 1
+         $mp_generation = Apache::Bootstrap->satisfy_mp_generation( 1 );
+     }
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+     # any mod_perl version will do
+     $mp_generation = Apache::Bootstrap->satisfy_mp_generation();
+     unless ( $mp_generation ) {
+         warn( 'No mod_perl installation was found' )
+     } else {
+         warn( "mod_perl generation $mp_generation was found" );
+     }
+
+    Currently the logic for determining the mod_perl generation is as
+    follows.
+
+     # If a specific generation was passed as an argument,
+     #     if satisfied
+     #         return the same generation
+     #     else
+     #         die
+     # else @ARGV and %ENV will be checked for specific orders
+     #     if the specification will be found
+     #         if satisfied
+     #             return the specified generation
+     #         else
+     #             die
+     #     else if any mp generation is found
+     #              return it
+     #           else
+     #              die
+
+  apache_major_version()
+     $apache_major_version = $bootstrap->apache_major_version;
+
+    The major version number of the target apache install
+
+  WriteMakefile()
+     $bootstrap->write_makefile( %makefile_options );
+
+    Writes the makefile using the appropriate make engine depending on what
+    mod_perl version is in use. Same API as ExtUtils::MakeMaker or
+    ModPerl::BuildMM
+
+AUTHOR
+    Fred Moyer <fred@redhotpenguin.com>
+
+    The mod_perl development team "<dev at perl.apache.org"> and numerous
+    contributors.
+
+    This code was lifted from Apache::SizeLimit in an effort to make it
+    useful to other modules such as Apache::Reload, Apache::Dispatch, any
+    dual life Apache module.
+
+BUGS
+    Please report bugs to the mod_perl development mailing list "<dev at
+    perl.apache.org">
 

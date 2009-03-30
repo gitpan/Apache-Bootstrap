@@ -62,12 +62,11 @@ SKIP: {
     # need a bootstrap object
     my $bootstrap = $dual_bootstrap || $mp2_bootstrap || $mp1_bootstrap;
 
-    my $at_version = $bootstrap->check_for_apache_test;
+    my $at_version = $bootstrap->check_for_apache_test(
+        $Apache::Test::VERSION + 0.01);
 
-    cmp_ok( $at_version, '==', $Apache::Test::VERSION, 'check a:t version' );
+    ok(!$at_version, 'check for non existing a:t version (+0.01)');
 }
-
-# TODO - figure out how to test absence of apache::test
 
 # delete mod_perl from INC
 delete $INC{'mod_perl.pm'};

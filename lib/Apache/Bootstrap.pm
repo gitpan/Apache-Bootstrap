@@ -9,7 +9,7 @@ Apache::Bootstrap - Bootstraps dual life mod_perl1 and mod_perl2 Apache modules
 
 =cut
 
-our $VERSION = '0.04_02';
+our $VERSION = '0.05';
 
 use constant MIN_MP2_VER => '1.99022';    # mp2 renaming
 
@@ -17,7 +17,7 @@ use constant MIN_MP2_VER => '1.99022';    # mp2 renaming
 
 In your Makefile.PL
 
- use Apache::Bootstrap 0.04;
+ use Apache::Bootstrap 0.05;
 
  my $bootstrap;
 

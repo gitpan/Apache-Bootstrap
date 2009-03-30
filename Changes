@@ -1,5 +1,11 @@
 Revision history for Apache-Bootstrap
 
+0.05 Mon Mar 30 10:25:54 PST 2009
+    - change apache test check for wrong version instead of valid a:t config
+
+0.05-rc1 Mon Jan 21 14:34:83 PST 2009
+    - code imported to ASF repository, thanks to pgollucci
+
 0.04_02  Sat Nov 08 17:07:56 PST 2008
     - skip more tests if no versions of mod_perl are present
     - clean up a bit more of the convoluted logic

@@ -1,5 +1,5 @@
 NAME
-    Apache::Bootstrap - Bootstraps dual life mod_perl1 and mod_perl2 Apache
+    Apache::Bootstrap - Bootstraps dual life mod_perl and mod_perl2 Apache
     modules
 
 SYNOPSIS
@@ -10,17 +10,17 @@ SYNOPSIS
      my $bootstrap;
 
      BEGIN {
-        # make sure we have at least one minimum version required
-        $bootstrap = Apache::Bootstrap->new({ mp2 => '1.99022', mp1 => 0, });
-     }
+        # check to make sure we have mod_perl 1 installed
+        $bootstrap = Apache::Bootstrap->new({ mod_perl => 0 });
 
-     # write the Makefile using a mod_perl version dependent build subsystem
-     $bootstrap->WriteMakefile( %maker_options );
+        # or check for mod_perl 2
+        $bootstrap = Apache::Bootstrap->new({ mod_perl2 => '1.99022' });
+     }
 
      # check for Apache::Test, return the installed version if exists
      my $has_apache_test = $bootstrap->check_for_apache_test();
 
-     # see if mod_perl2 is installed
+     # see if mod_perl2 is installed (useful when both mp1 and mp2 are installed)
      my $mp_generation = $bootstrap->satisfy_mp_generation( 2 );
 
      unless ($mp_generation) {
@@ -37,16 +37,28 @@ SYNOPSIS
           warn( "mod_perl generation $mp_generation was found" );
      }
 
+     # write the Makefile using a mod_perl version dependent build subsystem
+     $bootstrap->WriteMakefile( %maker_options );
+
+DESCRIPTION
+    Writing modules for mod_perl that work under both mod_perl and mod_perl2
+    is not fun.
+
+    This module is here to make that endeavour less painful. mod_perl2 is
+    great, but a lot of users are still using mod_perl. Migrating to
+    mod_perl2 while maintaining mod_perl compatibility isn't easy, and this
+    module is here to make that transition as painless as possible.
+
 METHODS
   new()
      # try to find these versions of mod_perl, die if none are found
      $bootstrap = Apache::Bootstrap->new({
          mod_perl2 => 1.99022, # after mp2 renaming
-         mod_perl1 => 0,       # any verison of mp1
+         mod_perl  => 0,       # any verison of mp1
      });
 
   mp_prereqs()
-     # returns the prerequisites for mod_perl versions in a hash reference
+     returns the prerequisites for mod_perl versions in a hash reference
 
   check_for_apache_test()
      $apache_test_version = Apache::Bootstrap->check_for_apache_test;
@@ -56,40 +68,21 @@ METHODS
 
   satisfy_mp_generation()
      # see if mod_perl2 is installed
-     my $mp_generation = Apache::Bootstrap->satisfy_mp_generation( 2 );
+     my $mp_generation = $bootstrap->satisfy_mp_generation( 2 );
 
      unless ($mp_generation) {
 
          # no mod_perl2?  look for mod_perl 1
-         $mp_generation = Apache::Bootstrap->satisfy_mp_generation( 1 );
+         $mp_generation = $bootstrap->satisfy_mp_generation( 1 );
      }
 
-     # any mod_perl version will do
-     $mp_generation = Apache::Bootstrap->satisfy_mp_generation();
+     # any mod_perl version will do, check for mp2 first
+     $mp_generation = $bootstrap->satisfy_mp_generation();
      unless ( $mp_generation ) {
          warn( 'No mod_perl installation was found' )
      } else {
          warn( "mod_perl generation $mp_generation was found" );
      }
-
-    Currently the logic for determining the mod_perl generation is as
-    follows.
-
-     # If a specific generation was passed as an argument,
-     #     if satisfied
-     #         return the same generation
-     #     else
-     #         die
-     # else @ARGV and %ENV will be checked for specific orders
-     #     if the specification will be found
-     #         if satisfied
-     #             return the specified generation
-     #         else
-     #             die
-     #     else if any mp generation is found
-     #              return it
-     #           else
-     #              die
 
   apache_major_version()
      $apache_major_version = $bootstrap->apache_major_version;

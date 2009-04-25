@@ -5,11 +5,11 @@ use strict;
 
 =head1 NAME
 
-Apache::Bootstrap - Bootstraps dual life mod_perl1 and mod_perl2 Apache modules
+Apache::Bootstrap - Bootstraps dual life mod_perl and mod_perl2 Apache modules
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use constant MIN_MP2_VER => '1.99022';    # mp2 renaming
 
@@ -17,16 +17,16 @@ use constant MIN_MP2_VER => '1.99022';    # mp2 renaming
 
 In your Makefile.PL
 
- use Apache::Bootstrap 0.05;
+ use Apache::Bootstrap 0.06;
 
  my $bootstrap;
 
  BEGIN {
     # check to make sure we have mod_perl 1 installed
-    $bootstrap = Apache::Bootstrap->new({ mp1 => 0 });
+    $bootstrap = Apache::Bootstrap->new({ mod_perl => 0 });
 
     # or check for mod_perl 2
-    $bootstrap = Apache::Bootstrap->new({ mp2 => '1.99022' });
+    $bootstrap = Apache::Bootstrap->new({ mod_perl2 => '1.99022' });
  }
 
  # check for Apache::Test, return the installed version if exists
@@ -54,11 +54,11 @@ In your Makefile.PL
 
 =head1 DESCRIPTION
 
-Writing modules for mod_perl that work under both mod_perl1 and mod_perl2 is not fun.
+Writing modules for mod_perl that work under both mod_perl and mod_perl2 is not fun.
 
 This module is here to make that endeavour less painful.  mod_perl2 is great, but
-a lot of users are still using mod_perl1.  Migrating to mod_perl2 while maintaining
-mod_perl1 compatibility isn't easy, and this module is here to make that transition
+a lot of users are still using mod_perl.  Migrating to mod_perl2 while maintaining
+mod_perl compatibility isn't easy, and this module is here to make that transition
 as painless as possible.
 
 =head1 METHODS
@@ -68,7 +68,7 @@ as painless as possible.
  # try to find these versions of mod_perl, die if none are found
  $bootstrap = Apache::Bootstrap->new({
      mod_perl2 => 1.99022, # after mp2 renaming
-     mod_perl1 => 0,       # any verison of mp1
+     mod_perl  => 0,       # any verison of mp1
  });
 
 =cut
@@ -79,10 +79,10 @@ sub new {
     die 'perldoc Apache::Bootstrap'
       unless $args
       && ref $args eq 'HASH'
-      && ( defined $args->{mod_perl1} or defined $args->{mod_perl2} );
+      && ( defined $args->{mod_perl} or defined $args->{mod_perl} );
 
     my %self;
-    if ( defined $args->{mod_perl1} ) {
+    if ( defined $args->{mod_perl} ) {
 
         # delete mp2 from inc first, note that we don't delete mod_perl2.pm
         delete $INC{'mod_perl.pm'};
@@ -91,21 +91,21 @@ sub new {
         eval { require mod_perl };
         if ($@) {
 
-            die 'mod_perl1 not present, cannot bootstrap mp1:  ' . $@ if $@;
+            die 'mod_perl not present, cannot bootstrap mp1:  ' . $@ if $@;
 
         }
-        elsif (( $mod_perl::VERSION < $args->{mod_perl1} )
+        elsif (( $mod_perl::VERSION < $args->{mod_perl} )
             or ( $mod_perl::VERSION >= MIN_MP2_VER ) )
         {
 
-            die sprintf( "mod_perl1 version %s not found, we have %s",
-                $args->{mod_perl1}, $mod_perl::VERSION );
+            die sprintf( "mod_perl version %s not found, we have %s",
+                $args->{mod_perl}, $mod_perl::VERSION );
 
         }
         else {
 
             # store the version we have
-            $self{mod_perl1} = $mod_perl::VERSION;
+            $self{mod_perl} = $mod_perl::VERSION;
         }
 
     }
@@ -135,7 +135,7 @@ sub new {
 
     # make sure that we have at least one mod_perl version present
     die "no versions of mod_perl could be found matching your constraints\n"
-      unless ( defined $self{mod_perl1} or defined $self{mod_perl2} );
+      unless ( defined $self{mod_perl} or defined $self{mod_perl2} );
 
     bless \%self, $class;
 
@@ -152,7 +152,7 @@ sub mp_prereqs {
     my $self = shift;
     return {
         map { $_ => $self->{$_} }
-          grep { /^mod_perl[12]$/ } keys %{$self}
+          grep { /^mod_perl2?$/ } keys %{$self}
     };
 }
 

@@ -1,5 +1,8 @@
 Revision history for Apache-Bootstrap
 
+0.06 Sat Apr 25 14:07:04 PST 2009
+    - replace confusing instances of mod_perl1 and mp1 with simply mod_perl
+
 0.05 Mon Mar 30 10:25:54 PST 2009
     - change apache test check for wrong version instead of valid a:t config
 

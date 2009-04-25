@@ -18,7 +18,7 @@ BEGIN {
     );
 
     # try bootstrapping just mp1
-    $mp1_bootstrap = eval { $pkg->new( { mod_perl1 => 0 } ) };
+    $mp1_bootstrap = eval { $pkg->new( { mod_perl => 0 } ) };
     $skip_mp1 = $@ if $@;
 
   SKIP: {
@@ -41,7 +41,7 @@ BEGIN {
         skip "Skipping dual bootstrap", 2 if ( $skip_mp1 or $skip_mp2 );
 
         $dual_bootstrap =
-          eval { $pkg->new( { mod_perl1 => 0, mod_perl2 => 1.99022 } ); };
+          eval { $pkg->new( { mod_perl => 0, mod_perl2 => 1.99022 } ); };
 
         # this should not throw an exception since individual bootstraps worked
         ok( !$@, 'no exception thrown for dual bootstrap: ' . $@ );

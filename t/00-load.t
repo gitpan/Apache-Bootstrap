@@ -18,6 +18,7 @@ BEGIN {
     );
 
     # try bootstrapping just mp1
+    diag("bootstrapping mp1 only");
     $mp1_bootstrap = eval { $pkg->new( { mod_perl => 0 } ) };
     $skip_mp1 = $@ if $@;
 
@@ -28,9 +29,10 @@ BEGIN {
     }
 
     # try bootstrapping just mp2
+    diag("bootstrapping mp2 only");
     $mp2_bootstrap = eval { $pkg->new( { mod_perl2 => 1.99022 } ) };
     $skip_mp2 = $@ if $@;
-
+  
   SKIP: {
         skip $skip_mp2, 1 if $skip_mp2;
 

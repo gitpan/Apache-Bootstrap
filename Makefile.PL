@@ -24,3 +24,17 @@ EOF
 
     return $self->SUPER::test();
 }
+
+sub MY::postamble {
+    my $self = shift;
+
+    my $string = $self->MM::postamble;
+
+    $string .= <<'EOF';
+tag :
+	svn copy https://svn.apache.org/repos/asf/perl/Apache-Bootstrap/trunk https://svn.apache.org/repos/asf/perl/Apache-Bootstrap/tags/$(VERSION_SYM)
+	@echo update lib/Apache/Bootstrap.pm VERSION now
+EOF
+
+    return $string;
+}

@@ -9,7 +9,7 @@ Apache::Bootstrap - Bootstraps dual life mod_perl and mod_perl2 Apache modules
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use constant MIN_MP2_VER => '1.99022';    # mp2 renaming
 
@@ -17,7 +17,7 @@ use constant MIN_MP2_VER => '1.99022';    # mp2 renaming
 
 In your Makefile.PL
 
- use Apache::Bootstrap 0.06;
+ use Apache::Bootstrap 0.07;
 
  my $bootstrap;
 
@@ -71,6 +71,9 @@ as painless as possible.
      mod_perl  => 0,       # any verison of mp1
  });
 
+These code checks to see if either mp1 or mp2 versions are present.
+One successful version check means that it returns a valid object.
+
 =cut
 
 sub new {
@@ -79,7 +82,7 @@ sub new {
     die 'perldoc Apache::Bootstrap'
       unless $args
       && ref $args eq 'HASH'
-      && ( defined $args->{mod_perl} or defined $args->{mod_perl} );
+      && ( defined $args->{mod_perl} or defined $args->{mod_perl2} );
 
     my %self;
     if ( defined $args->{mod_perl} ) {
@@ -90,16 +93,15 @@ sub new {
         # look for mp1
         eval { require mod_perl };
         if ($@) {
-
-            die 'mod_perl not present, cannot bootstrap mp1:  ' . $@ if $@;
+			warn("mod_perl not present, cannot bootstrap mp1");
 
         }
         elsif (( $mod_perl::VERSION < $args->{mod_perl} )
             or ( $mod_perl::VERSION >= MIN_MP2_VER ) )
         {
 
-            die sprintf( "mod_perl version %s not found, we have %s",
-                $args->{mod_perl}, $mod_perl::VERSION );
+            warn(sprintf( 'mod_perl version %s not found, we have %s',
+                $args->{mod_perl}, $mod_perl::VERSION ));
 
         }
         else {
@@ -110,19 +112,19 @@ sub new {
 
     }
 
-    if ( defined $args->{mod_perl2} ) {
+	if ( defined $args->{mod_perl2} ) {
 
         # look for mp2
         eval { require mod_perl2 };
 
         if ($@) {
-            die 'mod_perl2 not present, cannot bootstrap mp2:  ' . $@ if $@;
+            warn("mod_perl2 not present, cannot bootstrap mp2");
 
         }
         elsif ( $mod_perl2::VERSION < $args->{mod_perl2} ) {
 
-            die sprintf( "mod_perl2 version %s not found, we have %s",
-                $args->{mod_perl2}, $mod_perl2::VERSION );
+            warn(sprintf( "mod_perl2 version %s not found, we have %s",
+                $args->{mod_perl2}, $mod_perl2::VERSION ));
 
         }
         else {
@@ -242,7 +244,7 @@ sub satisfy_mp_generation {
 
         eval { require mod_perl };
         if ($@) {
-            warn("could not satisfy mp1: $@");
+            warn("require mod_perl failed");
             return;
         }
 
@@ -252,7 +254,7 @@ sub satisfy_mp_generation {
 
         eval { require mod_perl2 };
         if ($@) {
-            warn("could not satisfy mp2: $@");
+            warn("require mod_perl2 failed");
             return;
         }
 
@@ -263,11 +265,11 @@ sub satisfy_mp_generation {
         # try mp2 first
         eval { require mod_perl2 };
         if ($@) {
-            warn("could not satisfy mp2, trying mp1: $@");
+            warn("require mod_perl2 failed");
 
             eval { require mod_perl };
             if ($@) {
-                warn("could not satisfy mp1, giving up: $@");
+                warn("require mod_perl failed");
                 return;
             }
         }

@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     In your Makefile.PL
 
-     use Apache::Bootstrap 0.05;
+     use Apache::Bootstrap 0.06;
 
      my $bootstrap;
 
@@ -56,6 +56,9 @@ METHODS
          mod_perl2 => 1.99022, # after mp2 renaming
          mod_perl  => 0,       # any verison of mp1
      });
+
+    These code checks to see if either mp1 or mp2 versions are present. One
+    successful version check means that it returns a valid object.
 
   mp_prereqs()
      returns the prerequisites for mod_perl versions in a hash reference
